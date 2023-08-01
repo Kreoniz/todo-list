@@ -1,24 +1,7 @@
 import "./style.css";
+import noteFactory from "./note_factory";
+import projectFactory from "./project_factory";
 
-function noteFactory(title, description, priority, dueDate) {
-    return {
-        title,
-        description,
-        priority,
-        dueDate,
-    };
-}
-
-function projectFactory(name) {
-    const notes = [];
-    const getNotes = () => notes;
-    const addNote = note => {
-        notes.push(note);
-    }
-
-    return {
-        getNotes,
-        addNote,
-        name,
-    };
-}
+const defaultProject = projectFactory("Project");
+const sampleNote = noteFactory("Sample Note", "sample note's description!", 3, new Date());
+defaultProject.addNote(sampleNote);
