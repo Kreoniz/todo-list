@@ -11,21 +11,62 @@ projects.push(defaultProject);
 
 const anotherProject = projectFactory("Another Project");
 const anotherNote = noteFactory("Another Note", "Just an extra note for testing", 2, new Date());
-defaultProject.addNote(sampleNote);
-defaultProject.addNote(anotherNote);
+anotherProject.addNote(sampleNote);
+anotherProject.addNote(anotherNote);
 projects.push(anotherProject);
 
 const root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
 
-function renderProjects(root) {
-    for (let project of projects) {
-        const projectDiv = document.createElement("div");
-        projectDiv.classList.add("project");
-        projectDiv.textContent = project.getTitle();
+function renderProjectNotes(root, project) {
+    root.textContent = "";
 
-        root.appendChild(projectDiv);
+    const notes = project.getNotes();
+
+    for (const note of notes) {
+        const noteDiv = document.createElement("div");
+        noteDiv.classList.add("note-div");
+
+        const noteTitle = document.createElement("div");
+        noteTitle.classList.add("note-title");
+        noteTitle.textContent = note.getInfo().title;
+
+        const noteShowBtn = document.createElement("button");
+        noteShowBtn.classList.add("note-snow-btn");
+        noteShowBtn.type = "button";
+        noteShowBtn.textContent = "Show";
+
+        const notePriority = document.createElement("div");
+        notePriority.classList.add("note-priority");
+        notePriority.textContent = note.getInfo().priority;
+
+        const noteDate = document.createElement("div");
+        noteDate.classList.add("note-date");
+        noteDate.textContent = note.getInfo().dueDate.toDateString();
+
+        noteDiv.appendChild(noteTitle);
+        noteDiv.appendChild(noteShowBtn);
+        noteDiv.appendChild(notePriority);
+        noteDiv.appendChild(noteDate);
+
+        root.appendChild(noteDiv);
+    }
+}
+
+function renderProjects(root, projectNotesRoot) {
+    for (let i = 0; i < projects.length; i++) {
+        const project = projects[i];
+
+        const projectBtn = document.createElement("button");
+        projectBtn.type = "button";
+        projectBtn.classList.add("project");
+        projectBtn.textContent = project.getTitle();
+        projectBtn.dataset.id = i;
+
+        projectBtn.addEventListener("click", () => renderProjectNotes(projectNotesRoot, project));
+
+        root.appendChild(projectBtn);
     }
 }
 
@@ -39,19 +80,30 @@ function renderPage() {
     const projectsBlock = document.createElement("div");
     projectsBlock.id = "projects";
 
-    renderProjects(projectsBlock);
-    
     const newProjectBtn = document.createElement("button");
     newProjectBtn.type = "button";
     newProjectBtn.classList.add("new-project-btn");
     newProjectBtn.textContent = "Add Project";
 
+    const content = document.createElement("div");
+    content.classList.add("content");
+
+    const projectNotes = document.createElement("div");
+    projectNotes.classList.add("notes");
+    projectNotes.id = "notes";
+
+    const noteInfo = document.createElement("div");
+    noteInfo.classList.add("note-info");
+    noteInfo.id = "note-info";
+
+    renderProjects(projectsBlock, projectNotes);
+    
     sidebar.appendChild(mainHeading);
     sidebar.appendChild(projectsBlock);
     sidebar.appendChild(newProjectBtn);
 
-    const content = document.createElement("div");
-    content.classList.add("content");
+    content.appendChild(projectNotes);
+    content.appendChild(noteInfo);
 
     root.appendChild(sidebar);
     root.appendChild(content);
