@@ -15,9 +15,34 @@ anotherProject.addNote(sampleNote);
 anotherProject.addNote(anotherNote);
 projects.push(anotherProject);
 
+
 const root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
+
+function renderNote(note) {
+    noteInfoRoot.textContent = "";
+
+    const noteInfo = document.createElement("div");
+
+    const noteTitle = document.createElement("div");
+    noteTitle.textContent = note.title;
+    noteInfo.appendChild(noteTitle);
+
+    const noteDescription = document.createElement("div");
+    noteDescription.textContent = note.description;
+    noteInfo.appendChild(noteDescription);
+
+    const notePriority = document.createElement("div");
+    notePriority.textContent = note.priority;
+    noteInfo.appendChild(notePriority);
+
+    const noteDate = document.createElement("div");
+    noteDate.textContent = note.dueDate;
+    noteInfo.appendChild(noteDate);
+
+    noteInfoRoot.appendChild(noteInfo);
+}
 
 function renderProjectNotes(root, project) {
     root.textContent = "";
@@ -36,6 +61,7 @@ function renderProjectNotes(root, project) {
         noteShowBtn.classList.add("note-snow-btn");
         noteShowBtn.type = "button";
         noteShowBtn.textContent = "Show";
+        noteShowBtn.addEventListener("click", () => renderNote(note.getInfo()));
 
         const notePriority = document.createElement("div");
         notePriority.classList.add("note-priority");
@@ -64,7 +90,10 @@ function renderProjects(root, projectNotesRoot) {
         projectBtn.textContent = project.getTitle();
         projectBtn.dataset.id = i;
 
-        projectBtn.addEventListener("click", () => renderProjectNotes(projectNotesRoot, project));
+        projectBtn.addEventListener("click", () => {
+            noteInfoRoot.textContent = "";
+            renderProjectNotes(projectNotesRoot, project)
+        });
 
         root.appendChild(projectBtn);
     }
@@ -110,3 +139,6 @@ function renderPage() {
 }
 
 renderPage();
+renderProjectNotes(document.querySelector("#notes"), defaultProject);
+
+const noteInfoRoot = document.querySelector("#note-info");
