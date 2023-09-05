@@ -24,21 +24,26 @@ function renderNote(note) {
     noteInfoRoot.textContent = "";
 
     const noteInfo = document.createElement("div");
+    noteInfo.classList.add("note");
 
     const noteTitle = document.createElement("div");
     noteTitle.textContent = note.title;
+    noteTitle.classList.add("note-title");
     noteInfo.appendChild(noteTitle);
 
     const noteDescription = document.createElement("div");
     noteDescription.textContent = note.description;
+    noteDescription.classList.add("note-description");
     noteInfo.appendChild(noteDescription);
 
     const notePriority = document.createElement("div");
     notePriority.textContent = note.priority;
+    notePriority.classList.add("note-priority");
     noteInfo.appendChild(notePriority);
 
     const noteDate = document.createElement("div");
     noteDate.textContent = note.dueDate;
+    noteDate.classList.add("note-date");
     noteInfo.appendChild(noteDate);
 
     noteInfoRoot.appendChild(noteInfo);
@@ -47,15 +52,21 @@ function renderNote(note) {
 function renderProjectNotes(root, project) {
     root.textContent = "";
 
+    const projectTitle = document.createElement("div");
+    projectTitle.textContent = project.getTitle();
+    projectTitle.classList.add("project-title");
+    root.appendChild(projectTitle);
+
+
     const notes = project.getNotes();
 
     for (const note of notes) {
         const noteDiv = document.createElement("div");
         noteDiv.classList.add("note-div");
 
-        const noteTitle = document.createElement("div");
-        noteTitle.classList.add("note-title");
-        noteTitle.textContent = note.getInfo().title;
+        const projectNoteTitle = document.createElement("div");
+        projectNoteTitle.classList.add("project-note-title");
+        projectNoteTitle.textContent = note.getInfo().title;
 
         const noteShowBtn = document.createElement("button");
         noteShowBtn.classList.add("note-snow-btn");
@@ -71,7 +82,7 @@ function renderProjectNotes(root, project) {
         noteDate.classList.add("note-date");
         noteDate.textContent = note.getInfo().dueDate.toDateString();
 
-        noteDiv.appendChild(noteTitle);
+        noteDiv.appendChild(projectNoteTitle);
         noteDiv.appendChild(noteShowBtn);
         noteDiv.appendChild(notePriority);
         noteDiv.appendChild(noteDate);
