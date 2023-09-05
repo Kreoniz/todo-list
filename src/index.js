@@ -57,7 +57,6 @@ function renderProjectNotes(root, project) {
     projectTitle.classList.add("project-title");
     root.appendChild(projectTitle);
 
-
     const notes = project.getNotes();
 
     for (const note of notes) {
@@ -89,6 +88,18 @@ function renderProjectNotes(root, project) {
 
         root.appendChild(noteDiv);
     }
+
+    const addNote = document.createElement("div");
+    addNote.classList.add("note-div");
+
+    const addNoteBtn = document.createElement("button");
+    addNoteBtn.type = "button";
+    addNoteBtn.classList.add("add-note-btn");
+    addNoteBtn.textContent = "Add Note";
+
+    addNote.appendChild(addNoteBtn);
+
+    root.appendChild(addNote);
 }
 
 function renderProjects(root, projectNotesRoot) {
