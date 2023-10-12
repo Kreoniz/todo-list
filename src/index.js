@@ -1,6 +1,7 @@
 import "./style.css";
 import noteFactory from "./note_factory";
 import projectFactory from "./project_factory";
+import Cross from "./img/cross.svg";
 
 const projects = [];
 
@@ -15,10 +16,97 @@ anotherProject.addNote(sampleNote);
 anotherProject.addNote(anotherNote);
 projects.push(anotherProject);
 
-
 const root = document.createElement("div");
 root.id = "root";
 document.body.appendChild(root);
+
+function removeModal() {
+    const modal = document.querySelector("#modal");
+    root.removeChild(modal);
+}
+
+function validateProjectName(text) {
+    let regex = /^[a-zA-Z0-9 ]+$/;
+    if (regex.test(text)) {
+        return true;
+    }
+
+    return false;
+}
+
+function renderModal() {
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.id = "modal";
+
+    const mask = document.createElement("div");
+    mask.classList.add("mask");
+    mask.addEventListener("click", removeModal);
+    
+    const modalForm = document.createElement("form");
+    modalForm.classList.add("modal-form");
+
+    const heading = document.createElement("h2");
+    heading.textContent = "Add project";
+    modalForm.appendChild(heading);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.classList.add("modal-close");
+    closeBtn.type = "button";
+    closeBtn.addEventListener("click", removeModal);
+
+    const crossIcon = new Image();
+    crossIcon.classList.add("cross-icon");
+    crossIcon.src = Cross;
+    closeBtn.appendChild(crossIcon);
+
+    modalForm.append(closeBtn);
+
+    const nameField = document.createElement("div");
+    nameField.classList.add("project-name-field");
+    const namePrompt = document.createElement("label");
+    namePrompt.classList.add("project-name-prompt");
+    namePrompt.textContent = "New project name:";
+    namePrompt.htmlFor = "projectName";
+    const nameInput = document.createElement("input");
+    nameInput.classList.add("project-name-input");
+    nameInput.type = "text";
+    nameInput.name = "project-name";
+    nameInput.id = "projectName";
+    nameInput.maxLength = 16;
+    nameField.appendChild(namePrompt);
+    nameField.appendChild(nameInput);
+
+    modalForm.appendChild(nameField);
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "submit";
+    confirmBtn.classList.add("project-confirm-button");
+    confirmBtn.textContent = "Confirm";
+    confirmBtn.addEventListener("click", e => {
+        e.preventDefault();
+
+        const name = nameInput.value;
+
+        if (validateProjectName(name)) {
+            projects.push(projectFactory(nameInput.value));
+            const projectNotes = document.querySelector("#notes");
+            const projectsBlock = document.querySelector("#projects");
+            renderProjects(projectsBlock, projectNotes);
+            removeModal();
+            renderProjectNotes(document.querySelector("#notes"),
+                projects[projects.length - 1]);
+        }
+
+    });
+
+    modalForm.appendChild(confirmBtn);
+
+    modal.appendChild(mask);
+    modal.appendChild(modalForm);
+
+    root.appendChild(modal);
+}
 
 function renderNote(note) {
     noteInfoRoot.textContent = "";
@@ -103,6 +191,8 @@ function renderProjectNotes(root, project) {
 }
 
 function renderProjects(root, projectNotesRoot) {
+    root.textContent = "";
+
     for (let i = 0; i < projects.length; i++) {
         const project = projects[i];
 
@@ -135,6 +225,7 @@ function renderPage() {
     newProjectBtn.type = "button";
     newProjectBtn.classList.add("new-project-btn");
     newProjectBtn.textContent = "Add Project";
+    newProjectBtn.addEventListener("click", renderModal);
 
     const content = document.createElement("div");
     content.classList.add("content");
