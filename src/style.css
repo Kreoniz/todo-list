@@ -193,6 +193,17 @@ h1 {
     font-size: 1rem;
 }
 
+.error-hidden {
+    display: none;
+    visibility: hidden;
+}
+
+.project-name-error {
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    color: red;
+    font-size: 12px;
+}
+
 @media (max-width: 800px) {
     .modal-form {
         width: calc(100% - var(--padding) * 2 - 4rem);

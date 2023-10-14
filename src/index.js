@@ -10,7 +10,7 @@ const sampleNote = noteFactory("Sample Note", "sample note's description!", 3, n
 defaultProject.addNote(sampleNote);
 projects.push(defaultProject);
 
-const anotherProject = projectFactory("Another Project");
+const anotherProject = projectFactory("AnotherProject");
 const anotherNote = noteFactory("Another Note", "Just an extra note for testing", 2, new Date());
 anotherProject.addNote(sampleNote);
 anotherProject.addNote(anotherNote);
@@ -26,9 +26,15 @@ function removeModal() {
 }
 
 function validateProjectName(text) {
-    let regex = /^[a-zA-Z0-9 ]+$/;
-    if (regex.test(text)) {
-        return true;
+    let regex = /^[a-zA-Z0-9_]*$/;
+    if (!regex.test(text)) {
+        return "Project name should only contain letters, digits and underscore";
+    } else if (projects.filter(p => p.getTitle() == text).length) {
+        return "Project name should be unique";
+    } else if (text.length < 1) {
+        return "Project name should be at least 1 character long";
+    } else if (text.length > 16) {
+        return "Project name should be shorter than 16 characters long";
     }
 
     return false;
@@ -74,8 +80,21 @@ function renderModal() {
     nameInput.name = "project-name";
     nameInput.id = "projectName";
     nameInput.maxLength = 16;
+    nameInput.addEventListener("input", (event) => {
+        const value = event.currentTarget.value;
+        const errorDiv = document.querySelector("#error");
+        if (validateProjectName(value) && value) {
+            errorDiv.textContent = validateProjectName(value);
+        } else {
+            errorDiv.textContent = "";
+        }
+    });
+    const error = document.createElement("div");
+    error.classList.add("project-name-error");
+    error.id = "error";
     nameField.appendChild(namePrompt);
     nameField.appendChild(nameInput);
+    nameField.appendChild(error);
 
     modalForm.appendChild(nameField);
 
@@ -83,12 +102,14 @@ function renderModal() {
     confirmBtn.type = "submit";
     confirmBtn.classList.add("project-confirm-button");
     confirmBtn.textContent = "Confirm";
-    confirmBtn.addEventListener("click", e => {
-        e.preventDefault();
-
-        const name = nameInput.value;
-
-        if (validateProjectName(name)) {
+    confirmBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        const value = document.querySelector("#projectName").value;
+        const errorDiv = document.querySelector("#error");
+        if (validateProjectName(value)) {
+            errorDiv.textContent = validateProjectName(value);
+        } else {
+            errorDiv.textContent = "";
             projects.push(projectFactory(nameInput.value));
             const projectNotes = document.querySelector("#notes");
             const projectsBlock = document.querySelector("#projects");
@@ -97,7 +118,6 @@ function renderModal() {
             renderProjectNotes(document.querySelector("#notes"),
                 projects[projects.length - 1]);
         }
-
     });
 
     modalForm.appendChild(confirmBtn);
@@ -239,7 +259,7 @@ function renderPage() {
     noteInfo.id = "note-info";
 
     renderProjects(projectsBlock, projectNotes);
-    
+
     sidebar.appendChild(mainHeading);
     sidebar.appendChild(projectsBlock);
     sidebar.appendChild(newProjectBtn);
