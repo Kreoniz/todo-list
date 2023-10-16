@@ -116,7 +116,7 @@ function renderModal() {
             renderProjects(projectsBlock, projectNotes);
             removeModal();
             renderProjectNotes(document.querySelector("#notes"),
-                projects[projects.length - 1]);
+                projects[projects.length - 1], projects.length - 1);
         }
     });
 
@@ -157,8 +157,9 @@ function renderNote(note) {
     noteInfoRoot.appendChild(noteInfo);
 }
 
-function renderProjectNotes(root, project) {
+function renderProjectNotes(root, project, id) {
     root.textContent = "";
+    root.dataset.id = id;
 
     const projectTitle = document.createElement("div");
     projectTitle.textContent = project.getTitle();
@@ -193,8 +194,6 @@ function renderProjectNotes(root, project) {
         noteDiv.appendChild(noteShowBtn);
         noteDiv.appendChild(notePriority);
         noteDiv.appendChild(noteDate);
-
-        root.appendChild(noteDiv);
     }
 
     const addNote = document.createElement("div");
@@ -203,6 +202,9 @@ function renderProjectNotes(root, project) {
     const addNoteBtn = document.createElement("button");
     addNoteBtn.type = "button";
     addNoteBtn.classList.add("add-note-btn");
+    addNoteBtn.addEventListener("click", (e) => {
+        console.log(`add ${e.currentTarget}`);
+    });
     addNoteBtn.textContent = "Add Note";
 
     addNote.appendChild(addNoteBtn);
@@ -224,7 +226,7 @@ function renderProjects(root, projectNotesRoot) {
 
         projectBtn.addEventListener("click", () => {
             noteInfoRoot.textContent = "";
-            renderProjectNotes(projectNotesRoot, project)
+            renderProjectNotes(projectNotesRoot, project, i)
         });
 
         root.appendChild(projectBtn);
@@ -272,6 +274,6 @@ function renderPage() {
 }
 
 renderPage();
-renderProjectNotes(document.querySelector("#notes"), defaultProject);
+renderProjectNotes(document.querySelector("#notes"), defaultProject, 0);
 
 const noteInfoRoot = document.querySelector("#note-info");
