@@ -48,7 +48,7 @@ function renderModal() {
     const mask = document.createElement("div");
     mask.classList.add("mask");
     mask.addEventListener("click", removeModal);
-    
+
     const modalForm = document.createElement("form");
     modalForm.classList.add("modal-form");
 
@@ -158,13 +158,36 @@ function renderNote(note) {
 }
 
 function renderProjectNotes(root, project, id) {
+    document.querySelector("#note-info").textContent = "";
+
     root.textContent = "";
     root.dataset.id = id;
+
+    const projectHeader = document.createElement("div");
 
     const projectTitle = document.createElement("div");
     projectTitle.textContent = project.getTitle();
     projectTitle.classList.add("project-title");
-    root.appendChild(projectTitle);
+    const removeProjectBtn = document.createElement("button");
+    removeProjectBtn.type = "button";
+    removeProjectBtn.classList.add("remove-project-btn");
+    removeProjectBtn.addEventListener("click", e => {
+        const id = document.querySelector("#notes").dataset.id;
+        projects.splice(id, 1);
+        const projectNotes = document.querySelector("#notes");
+        const projectsBlock = document.querySelector("#projects");
+        renderProjects(projectsBlock, projectNotes);
+        renderProjectNotes(document.querySelector("#notes"),
+            projects[projects.length - 1], projects.length - 1);
+    });
+    const crossIcon = new Image();
+    crossIcon.classList.add("cross-icon");
+    crossIcon.src = Cross;
+    removeProjectBtn.appendChild(crossIcon);
+
+    projectHeader.appendChild(projectTitle);
+    projectHeader.appendChild(removeProjectBtn);
+    root.appendChild(projectHeader);
 
     const notes = project.getNotes();
 
@@ -194,6 +217,8 @@ function renderProjectNotes(root, project, id) {
         noteDiv.appendChild(noteShowBtn);
         noteDiv.appendChild(notePriority);
         noteDiv.appendChild(noteDate);
+
+        root.appendChild(noteDiv);
     }
 
     const addNote = document.createElement("div");
@@ -203,6 +228,7 @@ function renderProjectNotes(root, project, id) {
     addNoteBtn.type = "button";
     addNoteBtn.classList.add("add-note-btn");
     addNoteBtn.addEventListener("click", (e) => {
+        console.log(document.querySelector("#notes"));
         console.log(`add ${e.currentTarget}`);
     });
     addNoteBtn.textContent = "Add Note";
@@ -226,7 +252,7 @@ function renderProjects(root, projectNotesRoot) {
 
         projectBtn.addEventListener("click", () => {
             noteInfoRoot.textContent = "";
-            renderProjectNotes(projectNotesRoot, project, i)
+            renderProjectNotes(projectNotesRoot, project, i);
         });
 
         root.appendChild(projectBtn);
