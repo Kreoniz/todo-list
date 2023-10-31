@@ -194,12 +194,9 @@ h1 {
     font-size: 1rem;
 }
 
-.error-hidden {
-    display: none;
-    visibility: hidden;
-}
+.validation-error {
+    appearance: none;
 
-.project-name-error {
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
     color: red;
     font-size: 12px;

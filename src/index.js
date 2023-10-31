@@ -1,6 +1,8 @@
+import { parseISO } from 'date-fns'
 import "./style.css";
 import noteFactory from "./note_factory";
 import projectFactory from "./project_factory";
+import createInputField from "./create_input_field";
 import Cross from "./img/cross.svg";
 
 const projects = [];
@@ -90,7 +92,7 @@ function renderModal() {
         }
     });
     const error = document.createElement("div");
-    error.classList.add("project-name-error");
+    error.classList.add("validation-error");
     error.id = "error";
     nameField.appendChild(namePrompt);
     nameField.appendChild(nameInput);
@@ -120,6 +122,136 @@ function renderModal() {
         }
     });
 
+    modalForm.appendChild(confirmBtn);
+
+    modal.appendChild(mask);
+    modal.appendChild(modalForm);
+
+    root.appendChild(modal);
+}
+
+function renderNoteModal() {
+    const modal = document.createElement("div");
+    modal.classList.add("modal");
+    modal.id = "modal";
+
+    const mask = document.createElement("div");
+    mask.classList.add("mask");
+    mask.addEventListener("click", removeModal);
+
+    const modalForm = document.createElement("form");
+    modalForm.classList.add("modal-form");
+
+    const heading = document.createElement("h2");
+    heading.textContent = "Add note";
+    modalForm.appendChild(heading);
+
+    const closeBtn = document.createElement("button");
+    closeBtn.classList.add("modal-close");
+    closeBtn.type = "button";
+    closeBtn.addEventListener("click", removeModal);
+
+    const crossIcon = new Image();
+    crossIcon.classList.add("cross-icon");
+    crossIcon.src = Cross;
+    closeBtn.appendChild(crossIcon);
+
+    modalForm.append(closeBtn);
+
+    const error = document.createElement("div");
+    error.classList.add("validation-error");
+    error.id = "error";
+
+    function validateName(text) {
+        if (text.length < 1 || text.length > 20) {
+            return "The length of the note's title should be between 1 and 20 characters long";
+        }
+        return false;
+    }
+
+    function validateDate(date) {
+        if (!date) {
+            return "Invalid Date";
+        }
+        return false;
+    }
+
+    function validatePriority(priority) {
+        if (isNaN(priority)) {
+            return "Priority must be a number";
+        }
+        if (priority > 9 || priority < 1) {
+            return "Priority should be an integer from 1 to 9";
+        }
+        return false;
+    }
+
+    function validateDesc(desc) {
+        return false;
+    }
+
+    const nameField = createInputField("note-name", "New note name:", "text", error, validateName);
+    modalForm.appendChild(nameField);
+    const dateField = createInputField("note-date", "New note date:", "date", error, validateDate);
+    modalForm.appendChild(dateField);
+    const priorityField = createInputField("note-priority", "Priority:", "tel", error, validatePriority);
+    modalForm.appendChild(priorityField);
+
+    //const descField = createInputField("note-description", "Description:", "textarea", error, validateDesc);
+    const descField = document.createElement("div");
+    descField.classList.add("description-field");
+
+    const descFieldPrompt = document.createElement("label");
+    descFieldPrompt.classList.add("description-prompt");
+    descFieldPrompt.textContent = "Description:";
+    descFieldPrompt.htmlFor = "note-description";
+
+    const descFieldInput = document.createElement("textarea");
+    descFieldInput.classList.add("note-description");
+    descFieldInput.name = "note-description";
+    descFieldInput.id = "note-description";
+
+    descField.appendChild(descFieldPrompt);
+    descField.appendChild(descFieldInput);
+
+    modalForm.appendChild(descField);
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "submit";
+    confirmBtn.classList.add("note-confirm-button");
+    confirmBtn.textContent = "Confirm";
+    confirmBtn.addEventListener("click", (event) => {
+        event.preventDefault();
+        const nameInput = document.querySelector("#note-name");
+        const dateInput = document.querySelector("#note-date");
+        const parsedDate = parseISO(dateInput.value);
+        const priorityInput = document.querySelector("#note-priority");
+        const descriptionInput = document.querySelector("#note-description");
+
+        if (validateName(nameInput.value)) {
+            nameInput.style.borderColor = "red";
+            nameInput.style.outlineColor = "red";
+            error.textContent = validateName(nameInput.value);
+        } else if (validateDate(dateInput.value)) {
+            dateInput.style.borderColor = "red";
+            dateInput.style.outlineColor = "red";
+            error.textContent = validateDate(dateInput.value);
+        } else {
+            const newNote = noteFactory(
+                nameInput.value,
+                descriptionInput.value,
+                priorityInput.value,
+                parsedDate
+            );
+            const id = document.querySelector("#notes").dataset.id;
+            projects[id].addNote(newNote);
+            renderProjectNotes(document.querySelector("#notes"),
+                projects[id], id);
+            removeModal();
+        }
+    });
+
+    modalForm.append(error);
     modalForm.appendChild(confirmBtn);
 
     modal.appendChild(mask);
@@ -228,8 +360,7 @@ function renderProjectNotes(root, project, id) {
     addNoteBtn.type = "button";
     addNoteBtn.classList.add("add-note-btn");
     addNoteBtn.addEventListener("click", (e) => {
-        console.log(document.querySelector("#notes"));
-        console.log(`add ${e.currentTarget}`);
+        renderNoteModal();
     });
     addNoteBtn.textContent = "Add Note";
 
