@@ -359,7 +359,8 @@ function renderProjectNotes(root, project, id) {
         deleteBtn.addEventListener("click", e => {
             const currId = e.currentTarget.dataset.id;
             project.deleteNote(currId);
-            if (document.querySelector("#expanded-note").dataset.id == currId) {
+            const expandedNote = document.querySelector("#expanded-note");
+            if (expandedNote && expandedNote.dataset.id == currId) {
                 document.querySelector("#expanded-note").remove();
             }
             e.currentTarget.parentNode.remove();
