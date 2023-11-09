@@ -1,16 +1,26 @@
 export default function projectFactory(title) {
-    const notes = [];
+    let id = 0; 
+    const notes = {};
 
     const getTitle = () => title;
 
-    const getNotes = () => notes;
-    const addNote = note => {
-        notes.push(note);
+    const getNotes = () => {
+        return notes;
+    }
+
+    const addNote = (note) => {
+        notes[id] = note;
+        id++;
+    }
+
+    const deleteNote = (id) => {
+        delete notes[id];
     }
 
     return {
         getTitle,
         getNotes,
         addNote,
+        deleteNote,
     };
 }

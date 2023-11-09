@@ -28,9 +28,13 @@ function removeModal() {
 }
 
 function validateProjectName(text) {
-    let regex = /^[a-zA-Z0-9_]*$/;
-    if (!regex.test(text)) {
-        return "Project name should only contain letters, digits and underscore";
+    let whitespace = /^\s|\s$/;
+    let regex = /^[a-zA-Z0-9_ ]*$/;
+
+    if (whitespace.test(text)) {
+        return "There should not be leading or trailing whitespaces in the project's name";
+    } else if (!regex.test(text)) {
+        return "Project name should only contain letters, digits, whitespaces and underscore";
     } else if (projects.filter(p => p.getTitle() == text).length) {
         return "Project name should be unique";
     } else if (text.length < 1) {
@@ -186,10 +190,6 @@ function renderNoteModal() {
         return false;
     }
 
-    function validateDesc(desc) {
-        return false;
-    }
-
     const nameField = createInputField("note-name", "New note name:", "text", error, validateName);
     modalForm.appendChild(nameField);
     const dateField = createInputField("note-date", "New note date:", "date", error, validateDate);
@@ -197,7 +197,6 @@ function renderNoteModal() {
     const priorityField = createInputField("note-priority", "Priority:", "tel", error, validatePriority);
     modalForm.appendChild(priorityField);
 
-    //const descField = createInputField("note-description", "Description:", "textarea", error, validateDesc);
     const descField = document.createElement("div");
     descField.classList.add("description-field");
 
@@ -260,11 +259,13 @@ function renderNoteModal() {
     root.appendChild(modal);
 }
 
-function renderNote(note) {
+function renderNote(note, id) {
     noteInfoRoot.textContent = "";
 
     const noteInfo = document.createElement("div");
+    noteInfo.dataset.id = id;
     noteInfo.classList.add("note");
+    noteInfo.id = "expanded-note";
 
     const noteTitle = document.createElement("div");
     noteTitle.textContent = note.title;
@@ -323,7 +324,9 @@ function renderProjectNotes(root, project, id) {
 
     const notes = project.getNotes();
 
-    for (const note of notes) {
+    for (const id of Object.keys(notes)) {
+        const note = notes[id];
+
         const noteDiv = document.createElement("div");
         noteDiv.classList.add("note-div");
 
@@ -335,7 +338,7 @@ function renderProjectNotes(root, project, id) {
         noteShowBtn.classList.add("note-snow-btn");
         noteShowBtn.type = "button";
         noteShowBtn.textContent = "Show";
-        noteShowBtn.addEventListener("click", () => renderNote(note.getInfo()));
+        noteShowBtn.addEventListener("click", () => renderNote(note.getInfo(), id));
 
         const notePriority = document.createElement("div");
         notePriority.classList.add("note-priority");
@@ -345,10 +348,28 @@ function renderProjectNotes(root, project, id) {
         noteDate.classList.add("note-date");
         noteDate.textContent = note.getInfo().dueDate.toDateString();
 
+        const deleteBtn = document.createElement("button");
+        deleteBtn.type = "button";
+        deleteBtn.classList.add("note-delete-btn");
+        deleteBtn.dataset.id = id;
+        const crossIcon = new Image();
+        crossIcon.classList.add("cross-icon");
+        crossIcon.src = Cross;
+        deleteBtn.appendChild(crossIcon);
+        deleteBtn.addEventListener("click", e => {
+            const currId = e.currentTarget.dataset.id;
+            project.deleteNote(currId);
+            if (document.querySelector("#expanded-note").dataset.id == currId) {
+                document.querySelector("#expanded-note").remove();
+            }
+            e.currentTarget.parentNode.remove();
+        });
+
         noteDiv.appendChild(projectNoteTitle);
         noteDiv.appendChild(noteShowBtn);
         noteDiv.appendChild(notePriority);
         noteDiv.appendChild(noteDate);
+        noteDiv.appendChild(deleteBtn);
 
         root.appendChild(noteDiv);
     }
